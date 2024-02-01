@@ -12,15 +12,23 @@ def scrape_job_data(url):
     soup = BeautifulSoup(response.text, 'html.parser') #returns HTML code
 
     company_name = soup.find("h2").get_text() if soup.find("h2") else 'Not specified'
-    role = soup.find("h1", class_="ycdc-section-title mb-2").get_text()
+    role = soup.find("h1", class_="ycdc-section-title mb-2").get_text() if soup.find("h1", class_="ycdc-section-title mb-2") else 'Not specified'
     location_label = soup.find('strong', string='Location')
     location = location_label.find_next('span').text if location_label else 'Not specified'
     
-    # Updated pay and equity scraping logic
-    pay_equity_div = soup.find('div', class_="ycdc-card max-w-2xl").find('div', class_="")
+    # Updated pay and equity scraping logic with "$" check
+    pay_equity_div = soup.find('div', class_="ycdc-card max-w-2xl")
     if pay_equity_div:
-        pay = pay_equity_div.find('strong').get_text() if pay_equity_div.find('strong') else 'Not specified'
-        equity = pay_equity_div.find_all('span')[-1].get_text() if pay_equity_div.find_all('span') else 'Not specified'
+        pay = 'Not specified'
+        equity = 'Not specified'
+        for string in pay_equity_div.stripped_strings:
+            if "$" in string:
+                pay = string
+                break  # Assuming the first occurrence of "$" is always the pay
+        for string in pay_equity_div.stripped_strings:
+            if "%" in string:
+                equity = string
+                break  # Assuming the first occurrence of "%" is always the equity
     else:
         pay = 'Not specified'
         equity = 'Not specified'
