@@ -1,26 +1,31 @@
 from bs4 import BeautifulSoup
-import requests
 
-# Parse the HTML
-soup = BeautifulSoup(html_content, 'html.parser')
+def find_specific_ul(html_content):
+    # Parse the HTML content
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Navigate to the first div after the body tag
+    first_div = soup.body.find('div') # Assuming it's the very first div after <body>
+    
+    # Search for the div with the specified class name
+    target_div = first_div.find('div', class_="mx-auto max-w-ycdc-page")
+    
+    # Within that div, find the first section with the specified class name
+    target_section = target_div.find('section', class_="relative isolate z-0 border-retro-sectionBorder sm:pr-[13px] ycdcPlus:pr-0 pt-6 lg:pt-9 pb-6 lg:pb-9")
+    
+    # Within that section, find the first div with the specified class name
+    target_inner_div = target_section.find('div', class_="mt-4 lg:mt-6")
+    
+    # Finally, within this div, find the first ul tag
+    target_ul = target_inner_div.find('ul')
+    
+    # Return the ul element, or None if not found
+    return target_ul
 
-def extract_job_links(url):
-    # Fetch the HTML content from the URL
-    response = requests.get(url)
-    html_content = response.text
-
-    # Find all job links within the unordered list
-    job_links = soup.find_all('ul', class_='space-y-2 overflow-hidden')
-
-    # Extract job titles and links
-    #jobs = {link.get_text(): url + link['href'] for link in job_links}
-
-    return job_links
-
-# Example usage
-url = 'https://www.ycombinator.com/jobs/role/operations'
-# jobs = extract_job_links(url)
-# for title, link in jobs.items():
-#     print(f"{title}: {link}")
-
-print(extract_job_links(url))
+# Use the function with your HTML content
+# html_content = 'YOUR_HTML_CONTENT_HERE'
+# ul_element = find_specific_ul(html_content)
+# if ul_element:
+#     print(ul_element)
+# else:
+#     print("UL element not found.")
